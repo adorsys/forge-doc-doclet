@@ -83,14 +83,17 @@ public class ForgeDocDoclet extends Standard {
 		try {
 			File out = new File(System.getProperty("user.dir"));
 			System.out.println("OUT: " + out.getAbsolutePath());
-			File index = new File(out, "index.html");
+			File indexHtml = new File(out, "index.html");
+			File indexMarkdown = new File(out, "index.md");
 
 			Configuration configuration = new Configuration();
 			configuration.setClassForTemplateLoading(ForgeDocDoclet.class, "/");
-		    Template template = configuration.getTemplate("doc.freemarker.html");
-			
-		    OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(index));
-			template.process(data, output);
+		    
+			Template htmlTemplate = configuration.getTemplate("doc.freemarker.html");
+			htmlTemplate.process(data, new OutputStreamWriter(new FileOutputStream(indexHtml)));
+		
+			Template mdTemplate = configuration.getTemplate("doc.freemarker.md");
+			mdTemplate.process(data, new OutputStreamWriter(new FileOutputStream(indexMarkdown)));
 		
 			File css = new File(out, "css");
 			css.mkdirs();
