@@ -26,20 +26,6 @@ import freemarker.template.Template;
 
 public class ForgeDocDoclet extends Standard {
 	
-	private static boolean hasAnnotation(AnnotationDesc[] annotations, Class c) {
-		return hasAnnotation(annotations, c.getSimpleName());
-	}
-	
-	private static boolean hasAnnotation(AnnotationDesc[] annotations, String annotationName) {
-		System.out.println("Lookup: " + annotationName);
-		for (AnnotationDesc annotation : annotations) {
-			if (annotation.annotationType().name().equals(annotationName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	public static boolean start(RootDoc root) {
 		String title = getSingleOption(root, "windowtitle");
 		System.out.println(title);
@@ -49,7 +35,7 @@ public class ForgeDocDoclet extends Standard {
 		ClassDoc[] classes = root.classes();
 		for (int i = 0; i < classes.length; i++) {
 			ClassDoc c = classes[i];
-			if (!hasAnnotation(c.annotations(), Alias.class)) {
+			if (!DocletHelper.hasAnnotation(c.annotations(), Alias.class)) {
 				continue;
 			}
 			ForgeClass forgeClass = new ForgeClass();
@@ -80,37 +66,8 @@ public class ForgeDocDoclet extends Standard {
 		Map data = new HashMap();
 		data.put("title", title);
 		data.put("forgeClasses", forgeClasses);
-		try {
-			File out = new File(System.getProperty("user.dir"));
-			System.out.println("OUT: " + out.getAbsolutePath());
-			File indexHtml = new File(out, "index.html");
-			File indexMarkdown = new File(out, "index.md");
 
-			Configuration configuration = new Configuration();
-			configuration.setClassForTemplateLoading(ForgeDocDoclet.class, "/");
-		    
-			Template htmlTemplate = configuration.getTemplate("doc.freemarker.html");
-			htmlTemplate.process(data, new OutputStreamWriter(new FileOutputStream(indexHtml)));
-		
-			Template mdTemplate = configuration.getTemplate("doc.freemarker.md");
-			mdTemplate.process(data, new OutputStreamWriter(new FileOutputStream(indexMarkdown)));
-		
-			File css = new File(out, "css");
-			css.mkdirs();
-			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/css/bootstrap.css"), new File(css, "bootstrap.css"));
-
-			File js = new File(out, "js");
-			js.mkdirs();
-			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/js/jquery-1.9.0.js"), new File(js, "jquery-1.9.0.js"));
-			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/js/bootstrap.js"), new File(js, "bootstrap.js"));
-			
-			File img = new File(out, "img");
-			img.mkdirs();
-			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/img/glyphicons-halflings.png"), new File(img, "glyphicons-halflings.png"));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		DocumentationWriter.write(data);
 		
 		return true;
 	}
