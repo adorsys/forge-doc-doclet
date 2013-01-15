@@ -1,14 +1,10 @@
 package de.adorsys.forge.doclet;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.jboss.forge.shell.plugins.Alias;
 
 import com.sun.javadoc.AnnotationDesc;
@@ -21,13 +17,10 @@ import com.sun.tools.doclets.standard.Standard;
 
 import de.adorsys.forge.doclet.model.ForgeClass;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-
 public class ForgeDocDoclet extends Standard {
 	
 	public static boolean start(RootDoc root) {
-		String title = getSingleOption(root, "windowtitle");
+		String title = DocletHelper.getSingleOption(root, "windowtitle");
 		System.out.println(title);
 		
 		List<ForgeClass> forgeClasses = new ArrayList<ForgeClass>();
@@ -72,18 +65,4 @@ public class ForgeDocDoclet extends Standard {
 		return true;
 	}
 
-	private static String getSingleOption(RootDoc root, String name) {
-		String value = null;
-		for (String[] options : root.options()) {
-			String key = options[0];
-			System.out.println("KEY: " + key);
-			if (key.startsWith("-")) {
-				key = key.substring(1);
-			}
-			if (key != null && key.equals(name) && options.length > 1) {
-				value = options[1];
-			}
-		}
-		return value;
-	}
 }
