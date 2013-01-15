@@ -9,7 +9,7 @@
 
   <name>forge-doc Doclet</name>
 
-  <url>https://github.org/adorsys/forge-doc-doclet</url>
+  <url>https://github.com/adorsys/forge-doc-doclet</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
