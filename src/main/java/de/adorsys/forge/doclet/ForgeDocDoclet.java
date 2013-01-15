@@ -3,10 +3,13 @@ package de.adorsys.forge.doclet;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.forge.shell.plugins.Alias;
 
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
@@ -16,16 +19,43 @@ import com.sun.javadoc.Parameter;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 
+import de.adorsys.forge.doclet.model.ForgeClass;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 public class ForgeDocDoclet extends Standard {
+	
+	private static boolean hasAnnotation(AnnotationDesc[] annotations, Class c) {
+		return hasAnnotation(annotations, c.getSimpleName());
+	}
+	
+	private static boolean hasAnnotation(AnnotationDesc[] annotations, String annotationName) {
+		System.out.println("Lookup: " + annotationName);
+		for (AnnotationDesc annotation : annotations) {
+			if (annotation.annotationType().name().equals(annotationName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static boolean start(RootDoc root) {
 		String title = getSingleOption(root, "windowtitle");
 		System.out.println(title);
+		
+		List<ForgeClass> forgeClasses = new ArrayList<ForgeClass>();
+		
 		ClassDoc[] classes = root.classes();
 		for (int i = 0; i < classes.length; i++) {
-			System.out.println(classes[i]);
+			ClassDoc c = classes[i];
+			if (!hasAnnotation(c.annotations(), Alias.class)) {
+				continue;
+			}
+			ForgeClass forgeClass = new ForgeClass();
+			forgeClasses.add(forgeClass);
+			forgeClass.setName(c.name());
+			
 			MethodDoc[] methods = classes[i].methods();
 			for (int j = 0; j < methods.length; j++) {
 				MethodDoc m = methods[j];
@@ -49,6 +79,7 @@ public class ForgeDocDoclet extends Standard {
 		
 		Map data = new HashMap();
 		data.put("title", title);
+		data.put("forgeClasses", forgeClasses);
 		try {
 			File out = new File(System.getProperty("user.dir"));
 			System.out.println("OUT: " + out.getAbsolutePath());
