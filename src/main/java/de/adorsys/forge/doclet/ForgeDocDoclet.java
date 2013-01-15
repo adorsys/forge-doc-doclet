@@ -6,6 +6,8 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.ClassDoc;
@@ -46,6 +48,7 @@ public class ForgeDocDoclet extends Standard {
 
 		
 		Map data = new HashMap();
+		data.put("title", title);
 		try {
 			File out = new File(System.getProperty("user.dir"));
 			System.out.println("OUT: " + out.getAbsolutePath());
@@ -58,6 +61,19 @@ public class ForgeDocDoclet extends Standard {
 		    OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(index));
 			template.process(data, output);
 		
+			File css = new File(out, "css");
+			css.mkdirs();
+			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/css/bootstrap.css"), new File(css, "bootstrap.css"));
+
+			File js = new File(out, "js");
+			js.mkdirs();
+			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/js/jquery-1.9.0.js"), new File(js, "jquery-1.9.0.js"));
+			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/js/bootstrap.js"), new File(js, "bootstrap.js"));
+			
+			File img = new File(out, "img");
+			img.mkdirs();
+			FileUtils.copyInputStreamToFile(ForgeDocDoclet.class.getResourceAsStream("/bootstrap/img/glyphicons-halflings.png"), new File(img, "glyphicons-halflings.png"));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
